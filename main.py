@@ -36,6 +36,7 @@ from reportlab.lib.units import inch
 
 from flask import (
     Flask,
+    Response,
     request,
     redirect,
     url_for,
@@ -55,7 +56,7 @@ from waitress import create_server
 # ============================================================
 
 SHOP_NAME = "Finance Management"
-SHOP_ADDRESS = "Nagapattinam"
+SHOP_ADDRESS = ""
 SHOP_PHONE = ""
 
 WEB_HOST = "0.0.0.0"
@@ -1081,7 +1082,18 @@ def load_or_create_secret():
     return new_secret
 
 
+class CompatibleResponse(Response):
+    def set_cookie(self, *args, **kwargs):
+        kwargs.pop("partitioned", None)
+        return super().set_cookie(*args, **kwargs)
+
+    def delete_cookie(self, *args, **kwargs):
+        kwargs.pop("partitioned", None)
+        return super().delete_cookie(*args, **kwargs)
+
+
 web_app = Flask(__name__)
+web_app.response_class = CompatibleResponse
 web_app.secret_key = load_or_create_secret()
 
 web_app.config.update(
