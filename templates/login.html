@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Finance Management</title>
+    <style>
+      :root {
+        --bg-1: #0e1117;
+        --bg-2: #1b232d;
+        --panel: rgba(26, 31, 38, 0.9);
+        --panel-soft: rgba(38, 46, 55, 0.9);
+        --line: rgba(255,255,255,0.12);
+        --text: #f4f4f5;
+        --muted: #d1d5db;
+        --muted-2: #9aa4b2;
+        --gold: #f7c948;
+        --gold-2: #d9a81d;
+        --teal: #2ec4b6;
+        --teal-dark: #1ca59a;
+        --shadow: rgba(0,0,0,0.45);
+        --error: #ef4444;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #04070d 0%, #111920 38%, #111822 100%);
+        color: var(--text);
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      .page-shell {
+        width: min(980px, 100%);
+        min-height: 740px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 40%);
+      }
+
+      .brand {
+        position: absolute;
+        top: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-mark {
+        width: 78px;
+        height: 78px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #f8d86e, #b77a00 62%, #7a4d00 100%);
+        position: relative;
+        box-shadow: 0 0 18px rgba(247, 201, 72, 0.35);
+      }
+
+      .brand-mark::before,
+      .brand-mark::after {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        border: 6px solid rgba(22, 16, 7, 0.9);
+        border-left-color: transparent;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        transform: rotate(40deg);
+      }
+
+      .brand-mark::after {
+        inset: 28px;
+        border-width: 4px;
+        transform: rotate(-25deg);
+      }
+
+      .brand-title {
+        font-size: clamp(2.2rem, 3vw, 3.6rem);
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        margin: 0;
+        text-shadow: 0 3px 18px rgba(0,0,0,0.45);
+      }
+
+      .login-panel {
+        width: min(440px, calc(100% - 36px));
+        background: rgba(15, 18, 24, 0.92);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 32px 28px 26px;
+        box-shadow: 0 26px 55px var(--shadow);
+        position: relative;
+        z-index: 1;
+      }
+
+      .login-form {
+        margin-top: 18px;
+      }
+
+      .field {
+        margin-bottom: 18px;
+      }
+
+      label {
+        display: block;
+        color: rgba(255,255,255,0.9);
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      input {
+        width: 100%;
+        background: rgba(12, 16, 22, 0.9);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 1rem;
+        padding: 14px 12px;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      input:focus {
+        border-color: rgba(247, 201, 72, 0.9);
+        box-shadow: 0 0 0 3px rgba(247, 201, 72, 0.12);
+      }
+
+      .login-button {
+        width: 100%;
+        margin-top: 10px;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(180deg, var(--teal), var(--teal-dark));
+        color: white;
+        padding: 13px 16px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.15s ease, filter 0.2s ease;
+      }
+
+      .login-button:hover {
+        filter: brightness(1.04);
+      }
+
+      .login-button:active {
+        transform: translateY(1px);
+      }
+
+      .helper {
+        color: rgba(255,255,255,0.65);
+        text-align: center;
+        font-size: 0.97rem;
+        margin-top: 18px;
+      }
+
+      .flash-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(7, 10, 16, 0.42);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 40;
+      }
+
+      .flash-card {
+        width: min(420px, calc(100% - 36px));
+        background: rgba(245, 245, 245, 0.96);
+        color: #222;
+        border-radius: 10px;
+        border: 1px solid rgba(0,0,0,0.12);
+        box-shadow: 0 22px 46px rgba(0,0,0,0.4);
+        overflow: hidden;
+      }
+
+      .flash-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px 12px;
+        font-weight: 700;
+        color: #1d1d1d;
+      }
+
+      .flash-header .title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .flash-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #f97316;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 800;
+      }
+
+      .close-btn {
+        border: none;
+        background: transparent;
+        font-size: 1.7rem;
+        cursor: pointer;
+        color: #444;
+        line-height: 1;
+      }
+
+      .flash-body {
+        padding: 0 22px 18px;
+      }
+
+      .flash-message {
+        color: #1f2937;
+        font-weight: 600;
+        margin: 0;
+        padding: 8px 0 18px;
+        font-size: 1rem;
+      }
+
+      .flash-actions {
+        display: flex;
+        justify-content: center;
+      }
+
+      .flash-actions button {
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(180deg, #d1d5db, #b9c0c9);
+        color: #1f2937;
+        padding: 10px 30px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      @media (max-width: 600px) {
+        .page-shell {
+          min-height: 630px;
+        }
+
+        .brand {
+          top: 66px;
+        }
+
+        .brand-title {
+          font-size: 2.4rem;
+        }
+
+        .login-panel {
+          padding: 22px 18px 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="brand" aria-label="Finance Management">
+        <div class="brand-mark"></div>
+        <h1 class="brand-title">Finance Management</h1>
+      </div>
+
+      <div class="login-panel">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="flash-overlay" role="dialog" aria-live="assertive">
+              <div class="flash-card">
+                <div class="flash-header">
+                  <div class="title-wrap">
+                    <span class="flash-icon">!</span>
+                    <span>Login Error</span>
+                  </div>
+                  <button class="close-btn" type="button" aria-label="Close">×</button>
+                </div>
+                <div class="flash-body">
+                  <p class="flash-message">{{ message }}</p>
+                  <div class="flash-actions">
+                    <button type="button" class="close-btn-action">OK</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endwith %}
+
+        <form class="login-form" method="post">
+          <div class="field">
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" autocomplete="username" required>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+          </div>
+
+          <button class="login-button" type="submit">Login</button>
+        </form>
+
+        <div class="helper">Customer portal</div>
+      </div>
+    </div>
+
+    <script>
+      const overlay = document.querySelector('.flash-overlay');
+      if (overlay) {
+        const closeAll = () => overlay.remove();
+        overlay.querySelector('.close-btn').addEventListener('click', closeAll);
+        overlay.querySelector('.close-btn-action').addEventListener('click', closeAll);
+      }
+    </script>
+  </body>
+</html>

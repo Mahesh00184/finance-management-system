@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Loans</title>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --bg-2: #171d26;
+        --panel: rgba(20, 26, 34, 0.96);
+        --panel-alt: rgba(28, 35, 45, 0.96);
+        --border: rgba(255,255,255,0.12);
+        --text: #f2f3f5;
+        --muted: #b6bdc8;
+        --gold: #f4c542;
+        --gold-dark: #d9a617;
+        --amber: #f39c12;
+        --blue: #4ea2ff;
+        --green: #2ecc71;
+        --cyan: #48d1ff;
+        --red: #ff5a5f;
+        --shadow: rgba(0, 0, 0, 0.38);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", Arial, sans-serif;
+      }
+
+      .topbar {
+        background: var(--gold);
+        color: #111;
+        padding: 22px 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 0 rgba(0,0,0,0.08);
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 2.8rem);
+        line-height: 1.1;
+        font-weight: 800;
+      }
+
+      .brand p {
+        margin: 4px 0 0;
+        font-size: 1.15rem;
+      }
+
+      .logout {
+        display: inline-block;
+        padding: 10px 18px;
+        background: rgba(17, 17, 17, 0.86);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 700;
+      }
+
+      .main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+      }
+
+      .alert {
+        margin: 8px 0 16px;
+        padding: 12px 14px;
+        border-radius: 8px;
+      }
+      .alert-danger { background: rgba(255,90,95,0.14); color: #ffd4d7; }
+      .alert-warning { background: rgba(244,197,66,0.12); color: #ffe7a3; }
+      .alert-success { background: rgba(46,204,113,0.12); color: #d5f8e5; }
+
+      .welcome {
+        margin-bottom: 18px;
+      }
+
+      .welcome h2 {
+        margin: 0 0 8px;
+        font-size: clamp(2rem, 2.4vw, 3rem);
+        font-weight: 700;
+      }
+
+      .welcome .meta {
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin: 20px 0 28px;
+      }
+
+      .summary-card {
+        background: rgba(18, 24, 31, 0.8);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px 14px;
+        min-height: 120px;
+      }
+
+      .summary-card.balance {
+        border-color: rgba(255,90,95,0.9);
+      }
+
+      .summary-card.gold {
+        border-color: rgba(244,197,66,0.9);
+      }
+
+      .summary-card span {
+        display: inline-block;
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin-bottom: 10px;
+        padding: 0 6px;
+      }
+
+      .summary-card strong {
+        display: block;
+        font-size: clamp(1.7rem, 2.5vw, 2.7rem);
+        color: var(--text);
+        padding: 0 6px;
+      }
+
+      .summary-card small {
+        display: block;
+        color: var(--muted);
+        padding: 10px 6px 0;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 14px;
+        margin-bottom: 25px;
+        box-shadow: 0 14px 28px var(--shadow);
+      }
+
+      .card h3 {
+        margin: 0 0 14px;
+        font-size: 1.1rem;
+      }
+
+      .table-wrap { overflow-x: auto; }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+      }
+      th {
+        color: var(--gold);
+        background: rgba(255,255,255,0.02);
+      }
+      tr:hover td { background: rgba(255,255,255,0.02); }
+
+      .status {
+        display: inline-block;
+        min-width: 80px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+      .status-open { background: rgba(244,197,66,0.14); color: var(--gold); border: 1px solid rgba(244,197,66,0.6); }
+      .status-closed { background: rgba(46,204,113,0.12); color: var(--green); border: 1px solid rgba(46,204,113,0.6); }
+
+      .button {
+        display: inline-block;
+        background: var(--gold);
+        color: #111;
+        text-decoration: none;
+        border-radius: 6px;
+        padding: 9px 12px;
+        font-weight: 700;
+      }
+
+      details {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+      }
+      summary {
+        cursor: pointer;
+        color: var(--gold);
+        font-weight: 700;
+      }
+      .details-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+      .detail {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+      }
+      .detail span {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 8px;
+        font-size: 0.8rem;
+      }
+
+      .notice {
+        padding: 15px 16px;
+        color: #ffd9d9;
+        background: rgba(255,90,95,0.08);
+        border-left: 4px solid var(--red);
+        border-radius: 8px;
+      }
+
+      @media (max-width: 800px) {
+        .summary { grid-template-columns: 1fr; }
+        .details-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <h1>{{ shop_name }}</h1>
+        <p>{{ shop_address }}</p>
+      </div>
+      <a class="logout" href="{{ url_for('logout') }}">Logout</a>
+    </header>
+
+    <main class="main">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <section class="welcome">
+        <h2>Welcome, {{ customer_name }}</h2>
+        <div class="meta">Phone: <strong>{{ phone }}</strong> &nbsp;·&nbsp; Bills registered: <strong>{{ bills|length }}</strong></div>
+      </section>
+
+      <section class="summary">
+        <article class="summary-card balance">
+          <span>Total outstanding</span>
+          <strong>₹ {{ "{:,.2f}".format(total_balance) }}</strong>
+        </article>
+
+        <article class="summary-card gold">
+          <span>Live gold rate</span>
+          <strong>₹ {{ "{:,.2f}".format(gold_rate) }}/g</strong>
+          <small>Updated {{ gold_rate_updated }}</small>
+        </article>
+      </section>
+
+      <section class="card">
+        <h3>Your Bills and Loans</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bill Number</th>
+                <th>Date</th>
+                <th>Loan</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Receipt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for bill in bills %}
+                <tr>
+                  <td><strong>{{ bill["bill"] }}</strong></td>
+                  <td>{{ bill["date"] }}</td>
+                  <td>₹ {{ "{:,.2f}".format(bill["loan"]) }}</td>
+                  <td>₹ {{ "{:,.2f}".format(bill["paid"]) }}</td>
+                  <td>₹ {{ "{:,.2f}".format(bill["balance"]) }}</td>
+                  <td><span class="status status-{{ bill['status']|lower }}">{{ bill["status"] }}</span></td>
+                  <td><a class="button" href="{{ url_for('receipt', bill_id=bill['id']) }}">PDF</a></td>
+                </tr>
+                <tr>
+                  <td colspan="7">
+                    <details>
+                      <summary>View details for {{ bill["bill"] }}</summary>
+                      <div class="details-grid">
+                        <div class="detail"><span>Name</span><strong>{{ bill["name"] or "Customer" }}</strong></div>
+                        <div class="detail"><span>Phone</span><strong>{{ bill["phone"] or "-" }}</strong></div>
+                        <div class="detail"><span>Address</span><strong>{{ bill["address"] or "-" }}</strong></div>
+                        <div class="detail"><span>Metal</span><strong>{{ bill["metal"] or "-" }}</strong></div>
+                        <div class="detail"><span>Weight</span><strong>{{ bill["weight"] or "-" }}</strong></div>
+                        <div class="detail"><span>Details</span><strong>{{ bill["details"] or "-" }}</strong></div>
+                      </div>
+                    </details>
+                  </td>
+                </tr>
+              {% else %}
+                <tr><td colspan="7">No bills were found for this phone number.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Payment History - All Bills</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bill Number</th>
+                <th>Payment Date</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for payment in payments %}
+                <tr>
+                  <td>{{ payment["bill"] }}</td>
+                  <td>{{ payment["date"] }}</td>
+                  <td>₹ {{ "{:,.2f}".format(payment["amount"]) }}</td>
+                </tr>
+              {% else %}
+                <tr><td colspan="3">No payments have been recorded.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="notice">
+        <strong>Important:</strong> Payment must be made at least once every three months for each open bill.
+      </section>
+    </main>
+  </body>
+</html>

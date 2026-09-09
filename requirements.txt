@@ -1,0 +1,9 @@
+ttkbootstrap
+pandas
+openpyxl
+reportlab
+Pillow
+Flask
+Werkzeug
+waitress
+pyinstaller
